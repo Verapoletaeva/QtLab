@@ -1,112 +1,81 @@
-var db = LocalStorage.openDatabaseSync("Workers", "1.0", "Workers SQL Database");
+function dbInit() {
+    var db = LocalStorage.openDatabaseSync("Workers", "", "Workers SQL Database", 1000000);
 
-//try {
-//    db.transaction(function(tx){
-//        tx.executeSql('CREATE TABLE IF NOT EXISTS Workers(ID, surname, name, patronymic, education, position, departmentName, companyName)');
-//        console.log('Database initialized');
-//    })
-//} catch (err) {
-//    console.log("Error creating table in database: " + err);
-//}
-
-//function dbGetHandle()
-//{
-//    try {
-//        var db = LocalStorage.openDatabaseSync("Workers", "1.0", "Workers SQL Database");
-//    } catch (err) {
-//        console.log("Error opening database: " + err)
-//    }
-//    return db;
-//}
-
-//удаление работника по id
-function removeWorker(ID) {
-//    var db = dbGetHandle();
-//    if (!db) initializeDB();
-
-    db.transaction(function(tx) {
-        tx.executeSql('DELETE FROM Workers WHERE ID = ?', [ID]);
-    });
+    try {
+        db.transaction(function(tx){
+            tx.executeSql('CREATE TABLE IF NOT EXISTS Workers(ID text, surname text, name text, patronymic text, education text, position text, departmentName text, companyName text)');
+            console.log('Database initialized');
+            tx.executeSql('DELETE * FROM Workers');
+        })
+    } catch (err) {
+        console.log("Error creating table in database: " + err);
+    };
 }
 
-//добавление работника
-function addWorker(surname, name, patronymic, education, position, departmentName, companyName) {
-//    var db = dbGetHandle();
-//    if (!db) initializeDB();
-
-    db.transaction(function(tx) {
-        tx.executeSql(
-                    'INSERT INTO Workers VALUES(?, ?, ?, ?, ?, ?, ?, ?)',
-                    [newID(), surname, name, patronymic, education, position, departmentName, companyName]
-                    );
-    });
-}
-
-//получить работника по id
-function getWorkerById(ID) {
-//    var db = dbGetHandle();
-//    if (!db) initializeDB();
-
-    var workers;
-    db.transaction(function(tx) {
-        var rs = tx.executeSql('SELECT * FROM Workers WHERE ID = ?', [ID]);
-        workers = rs.rows
-    });
-    return workers;
-}
-
-//получить список сотрудников, удовл. параметрам
-function getWorkersByParams(params, callback) {
-//    var db = dbGetHandle();
-//    if (!db) initializeDB();
-
-    db.transaction(function(tx) {
-        var rs = tx.executeSql('SELECT * FROM Workers');
-        var model = [];
-        var rows = rs.rows;
-        for(var i = 0; i < rows.length; i++)
-            if(rows.item(i).surname === params.surname || params.surname === '') //surname
-                if(rows.item(i).name === params.name || params.name === '') //name
-                    if(rows.item(i).patronymic === params.patronymic || params.patronymic === '') //patronymic
-                        if(rows.item(i).education === params.education || params.education === '') //education
-                            if(rows.item(i).position === params.position || params.position === '') //position
-                                if(rows.item(i).departmentName === params.departmentName || params.departmentName === '') //departmentName
-                                    if(rows.item(i).companyName === params.companyName || params.companyName === '') //companyName
-                                        model.push(rows.item(i));
-
-        callback(model);
-    });
-}
-
-//создание еще неиспользуемого id
-function newID() {
-    var idExist = true;
-    var id = 0;
-    while(idExist) {
-        getWorkerById(id, function(rows) { idExist = (rows.length > 0) })
-        id++;
+function dbGetHandle() {
+    try {
+        var db = LocalStorage.openDatabaseSync("Workers", "", "Workers SQL Database", 1000000);
+    } catch (err) {
+        console.log("Error opening database: " + err);
     }
-    return id.toString();
+
+    return db;
 }
 
-//получить список всех работиков
-function getAllWorkers(callback) {
-//    var db = dbGetHandle();
-//    if (!db) initializeDB();
-
+function dbInsert(surname, name, patronymic, education, position, departmentName, companyName) {
+    var db = dbGetHandle();
+    var rowid = 0;
     db.transaction(function(tx) {
-        var rs = tx.executeSql('SELECT * FROM Workers');
-        var model = [];
-        for (var i = 0; i < rs.rows.length; i++) {
-            var row = rs.rows.item(i);
-            model.push({
-                           ID: row.ID,
-                           surname: row.surname,
-                           name: row.name,
-                           patronymic: row.patronymic
-                       })
+        tx.executeSql('INSERT INTO Workers VALUES(?,?,?,?,?,?,?)',
+                      [surname, name, patronymic, education, position, departmentName, companyName]);
+        var result = tx.executeSql('SELECT last_insert_rowid()');
+        rowid = result.insertId;
+    })
+}
+
+function dbGetAll() {
+    var db = dbGetHandle();
+    var model = []
+    db.transaction(function(tx) {
+        var result = tx.executeSql('SELECT rowid,surname,name,patronymic FROM Workers ORDER BY rowid');
+        if (result.rows) {
+            for (var i = 0; i < result.rows.length; i++) {
+                model.push({
+                               ID: result.rows.item(i).rowid,
+                               surname: result.rows.item(i).surname,
+                               name: result.rows.item(i).name,
+                               patronymic: result.rows.item(i).patronymic
+                           })
+            }
         }
-        callback(model);
     });
+    return model;
+}
+
+function dbDeleteRow(id) {
+    var db = dbGetHandle();
+    db.transaction(function(tx) {
+        tx.executeSql('DELETE FROM Workers WHERE rowid = ?', [id]);
+    })
+}
+
+function dbGetById(id) {
+    var db = dbGetHandle();
+    var result;
+    db.transaction(function(tx) {
+        result = tx.executeSql('SELECT * FROM Workers WHERE rowid = ?', [id]);
+    });
+
+    if (result.rows.item(0))
+        return {
+            ID: result.rows.item(i).rowid,
+            surname: result.rows.item(i).surname,
+            name: result.rows.item(i).name,
+            patronymic: result.rows.item(i).patronymic,
+            education: result.rows.item(i).education,
+            position: result.rows.item(i).position,
+            departmentName: result.rows.item(i).departmentName,
+            companyName: result.rows.item(i).companyName
+        }
 }
 

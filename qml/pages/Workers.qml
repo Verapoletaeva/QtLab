@@ -6,6 +6,7 @@ import "../Workers.js" as WR
 
 Page {
     property var workers: []
+    property bool all: false
 
     id: workersPage
 
@@ -23,10 +24,16 @@ Page {
             Text {
                 color: "black"
                 anchors.centerIn: parent
-                text: model.surname + " " + firstLetter(model.name) + "." + firstLetter(model.patronymic) + "."
+                text: model.ID + ' ' + model.surname + " "// + firstLetter(model.name) + "." + firstLetter(model.patronymic) + "."
             }
         }
     }
+
+    Component.onCompleted: {
+        if (all)
+            workers = WR.dbGetAll();
+    }
+
     function firstLetter(str) {
         if (str.length)
             return str[0];

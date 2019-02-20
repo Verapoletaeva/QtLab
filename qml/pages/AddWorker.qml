@@ -5,7 +5,7 @@ import QtQuick.LocalStorage 2.0
 import "../Workers.js" as WR
 
 Page {
-    id: addWorker
+    id: addWorkerPage
 
     SilicaFlickable{
         anchors.fill: parent
@@ -17,55 +17,55 @@ Page {
             id: column
             width: parent.width
 
-            PageHeader { title: qsTr("Добавление сотрудника") }
+            PageHeader { title: "Добавление сотрудника" }
 
-            TextArea {
-                id: workerSurname;
+            TextField {
+                id: surname
                 width: parent.width
-                label: qsTr("Фамилия")
-                placeholderText: qsTr("Введите фамилию")
+                label: "Фамилия"
+                placeholderText: "Введите фамилию"
             }
 
-            TextArea {
-                id: workerName
+            TextField {
+                id: name
                 width: parent.width
-                label: qsTr("Имя")
-                placeholderText: qsTr("Введите имя")
+                label: "Имя"
+                placeholderText: "Введите имя"
             }
 
-            TextArea {
-                id: workerPatronymic
+            TextField {
+                id: patronymic
                 width: parent.width
-                label: qsTr("Отчество")
-                placeholderText: qsTr("Введите отчество")
+                label: "Отчество"
+                placeholderText: "Введите отчество"
             }
 
-            TextArea {
-                id: workerEducation
+            TextField {
+                id: education
                 width: parent.width
-                label: qsTr("Образование")
-                placeholderText: qsTr("Введите образование")
+                label: "Образование"
+                placeholderText: "Введите образование"
             }
 
-            TextArea {
-                id: workerPosition
+            TextField {
+                id: position
                 width: parent.width
-                label: qsTr("Должность")
-                placeholderText: qsTr("Введите должность")
+                label: "Должность"
+                placeholderText: "Введите должность"
             }
 
-            TextArea {
-                id: workerDepartmentName
+            TextField {
+                id: departmentName
                 width: parent.width
-                label: qsTr("Отдел")
-                placeholderText: qsTr("Введите название отдела")
+                label: "Отдел"
+                placeholderText: "Введите название отдела"
             }
 
-            TextArea {
-                id: workerCompanyName
+            TextField {
+                id: companyName
                 width: parent.width
-                label: qsTr("Компания")
-                placeholderText: qsTr("Введите название компании")
+                label: "Компания"
+                placeholderText: "Введите название компании"
             }
 
             Text {
@@ -76,24 +76,25 @@ Page {
 
             Button {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("Добавить")
-                onClicked: addNewWorker()
+                text: "Добавить"
+                onClicked: WR.dbInsert(surname.text, name.text, patronymic.text,
+                                       education.text, position.text, departmentName.text, companyName.text)
             }
         }
     }
 
-    function addNewWorker() {
-        if(workerSurname.length === 0 || workerName.length === 0
-                || workerPatronymic.length === 0 || workerEducation.length === 0
-                || workerPosition.length === 0 || workerDepartmentName.length === 0 || workerCompanyName.length === 0){
-            errorMessage.text = 'Есть незаполненные обязательные поля!';
-            console.log("Не добавлен");
-        } else {
-            errorMessage.text = ''
-            WR.addWorker(workerSurname.text, workerName.text, workerPatronymic.text,
-                         workerEducation.text, workerPosition.text, workerDepartmentName.text, workerCompanyName.text);
-            console.log(workerSurname.text, workerName.text, workerPatronymic.text,
-                        workerEducation.text, workerPosition.text, workerDepartmentName.text, workerCompanyName.text);
-        }
-    }
+//    function addNewWorker() {
+//        if(workerSurname.length === 0 || workerName.length === 0
+//                || workerPatronymic.length === 0 || workerEducation.length === 0
+//                || workerPosition.length === 0 || workerDepartmentName.length === 0 || workerCompanyName.length === 0){
+//            errorMessage.text = 'Есть незаполненные обязательные поля!';
+//            console.log("Не добавлен");
+//        } else {
+//            errorMessage.text = ''
+//            WR.addWorker(workerSurname.text, workerName.text, workerPatronymic.text,
+//                         workerEducation.text, workerPosition.text, workerDepartmentName.text, workerCompanyName.text);
+//            console.log(workerSurname.text, workerName.text, workerPatronymic.text,
+//                        workerEducation.text, workerPosition.text, workerDepartmentName.text, workerCompanyName.text);
+//        }
+//    }
 }

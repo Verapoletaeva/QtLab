@@ -5,11 +5,8 @@ import QtQuick.LocalStorage 2.0
 import "../Workers.js" as WR
 
 Page {
-    property string workerId: ''
+    property var workerId
 
-    function loadWorkerInfo() {
-        WR.getWorker(function(worker) {
 
-        })
-    }
+
 }

@@ -34,7 +34,7 @@ Page {
                 id: searchByIdBtn
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("Найти")
-                onClicked: searchById()
+                onClicked: pageStack.push(Qt.resolvedUrl('WorkerInfo.qml'), {workerID: workerID})
             }
 
             SectionHeader { text: "По параметрам" }
@@ -109,14 +109,8 @@ Page {
             }
         }
     }
-    function searchById() {
-        if (workerID.text)
-            WR.getWorkerById(workerID.text.toString(), function(rows) {
-                pageStack.push(Qt.resolvedUrl('Workers.qml'), {workers: rows});
-            });
-    }
 
     function searchByParams() {
-        pageStack.push(Qt.resolvedUrl('Workers.qml'), {})
+        //pageStack.push(Qt.resolvedUrl('Workers.qml'), {})
     }
 }

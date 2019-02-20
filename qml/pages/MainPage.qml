@@ -7,7 +7,7 @@ import "../Workers.js" as WR
 Page {
     id: mainPage
 
-    onVisibleChanged: dbInit()
+    //onVisibleChanged: dbInit()
 
     ListModel {
         id: pagesModel
@@ -42,22 +42,13 @@ Page {
                 x: Theme.horizontalPageMargin
             }
             onClicked: {
-                if (model.page === 'All')
-                    showAll();
-                else
-                    pageStack.push(Qt.resolvedUrl(page + '.qml'));
+                if (model.page === 'All'){
+                    pageStack.push(Qt.resolvedUrl('Workers.qml'), { all: true });
+                } else pageStack.push(Qt.resolvedUrl(page + '.qml'));
             }
         }
         VerticalScrollDecorator {}
     }
 
-    function showAll() {
-        WR.getAllWorkers(function(rows) {
-            pageStack.push(Qt.resolvedUrl('Workers.qml', { workers: rows }));
-        })
-    }
-
-    function dbInit() {
-//        WR.initializeDB();
-    }
+    Component.onCompleted: { WR.dbInit() }
 }

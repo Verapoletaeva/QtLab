@@ -10,28 +10,39 @@ Page {
 
     id: workersPage
 
-    PageHeader { title: qsTr("Сотрудники") }
+    ListModel { id: workerList }
 
     SilicaListView {
+        id: listView
         anchors.fill: parent
         width: parent.width
-        model: workers
+        model: workerList
 
-        delegate: BackgroundItem {
-            width: parent.width
-            onClicked: pageStack.push(Qt.resolvedUrl("WorkerInfo.qml"), {workerId: model.ID})
+        header: PageHeader { title: qsTr("Сотрудники") }
+        onVisibleChanged: {
+            if(all)
+                workers = WR.dbGetAll()
+            else {
 
-            Text {
-                color: "black"
-                anchors.centerIn: parent
-                text: model.ID + ' ' + model.surname + " "// + firstLetter(model.name) + "." + firstLetter(model.patronymic) + "."
+            }
+
+            for (var i = 0; i < workers.length; i++) {
+                workerList.append(workers[i]);
             }
         }
-    }
 
-    Component.onCompleted: {
-        if (all)
-            workers = WR.dbGetAll();
+        delegate: BackgroundItem {
+            width: listView.width
+
+            Label {
+                color: highlighted ? Theme.highlightColor : Theme.primaryColor
+                anchors.verticalCenter: parent.verticalCenter
+                x: Theme.horizontalPageMargin
+                text: model.ID + ' ' + model.surname + " " + firstLetter(model.name) + "." + firstLetter(model.patronymic) + "."
+            }
+
+            onClicked: pageStack.push(Qt.resolvedUrl("WorkerInfo.qml"), {workerId: model.ID})
+        }
     }
 
     function firstLetter(str) {

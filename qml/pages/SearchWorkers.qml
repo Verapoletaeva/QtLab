@@ -27,7 +27,8 @@ Page {
                 label: "ID"
                 placeholderText: "ID сотрудника"
                 inputMethodHints: Qt.ImhFormattedNumbersOnly
-                EnterKey.onClicked: searchByIdBtn.focus = true
+                EnterKey.onClicked: pageStack.push(Qt.resolvedUrl('WorkerInfo.qml'),
+                                                   {workerID: workerID})
             }
 
             Button {
@@ -98,11 +99,11 @@ Page {
                 width: parent.width
                 label: qsTr("Компания")
                 placeholderText: qsTr("Название компании")
-                EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: focus = true
+                onClicked: searchByParams()
             }
 
             Button {
+                id: searchByParamsBtn
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("Найти")
                 onClicked: searchByParams()

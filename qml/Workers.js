@@ -3,9 +3,10 @@ function dbInit() {
 
     try {
         db.transaction(function(tx){
-            tx.executeSql('CREATE TABLE IF NOT EXISTS Workers(ID text, surname text, name text, patronymic text, education text, position text, departmentName text, companyName text)');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS Workers(surname text, name text, patronymic text, education text, position text, departmentName text, companyName text)');
             console.log('Database initialized');
-            tx.executeSql('DELETE * FROM Workers');
+            //tx.executeSql('DROP TABLE Workers');
+            //tx.executeSql('DELETE FROM Workers');
         })
     } catch (err) {
         console.log("Error creating table in database: " + err);
@@ -30,23 +31,24 @@ function dbInsert(surname, name, patronymic, education, position, departmentName
                       [surname, name, patronymic, education, position, departmentName, companyName]);
         var result = tx.executeSql('SELECT last_insert_rowid()');
         rowid = result.insertId;
-    })
+    });
+    console.log('Новый пользователь!');
 }
 
 function dbGetAll() {
     var db = dbGetHandle();
-    var model = []
+    var model = [];
     db.transaction(function(tx) {
         var result = tx.executeSql('SELECT rowid,surname,name,patronymic FROM Workers ORDER BY rowid');
-        if (result.rows) {
-            for (var i = 0; i < result.rows.length; i++) {
-                model.push({
-                               ID: result.rows.item(i).rowid,
-                               surname: result.rows.item(i).surname,
-                               name: result.rows.item(i).name,
-                               patronymic: result.rows.item(i).patronymic
-                           })
-            }
+
+        for (var i = 0; i < result.rows.length; i++) {
+            model.push({
+                           ID: result.rows.item(i).rowid,
+                           surname: result.rows.item(i).surname,
+                           name: result.rows.item(i).name,
+                           patronymic: result.rows.item(i).patronymic
+                       })
+            console.log(model[i].name);
         }
     });
     return model;

@@ -6,7 +6,20 @@ import "../Workers.js" as WR
 
 Page {
     property var workerId
+    property var worker
 
+    onVisibleChanged: {
+        worker = WR.dbGetById(workerId);
+    }
 
+    ListModel {
+        ListElement {
+            title: surname
+            value: worker.surname
+        }
+    }
 
+//    SilicaListView {
+//        delegate:
+//    }
 }

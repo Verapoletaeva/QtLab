@@ -20,6 +20,8 @@ Page {
 
         header: PageHeader { title: qsTr("Сотрудники") }
         onVisibleChanged: {
+            workerList.clear();
+
             if(all)
                 workers = WR.dbGetAll()
             else {
@@ -38,10 +40,10 @@ Page {
                 color: highlighted ? Theme.highlightColor : Theme.primaryColor
                 anchors.verticalCenter: parent.verticalCenter
                 x: Theme.horizontalPageMargin
-                text: model.ID + ' ' + model.surname + " " + firstLetter(model.name) + "." + firstLetter(model.patronymic) + "."
+                text: model.ID + ' ' + model.surname + ' ' + firstLetter(model.name) + '.' + firstLetter(model.patronymic) + '.'
             }
 
-            onClicked: pageStack.push(Qt.resolvedUrl("WorkerInfo.qml"), {workerId: model.ID})
+            onClicked: { pageStack.push(Qt.resolvedUrl("WorkerInfo.qml"), {workerId: model.ID}) }
         }
     }
 

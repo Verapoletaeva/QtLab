@@ -24,6 +24,10 @@ Page {
             title: 'Добавить сотрудника'
             page: 'AddWorker'
         }
+        ListElement {
+            title: 'Удалить сотрудника'
+            page: 'RemoveWorker'
+        }
     }
 
     SilicaListView {

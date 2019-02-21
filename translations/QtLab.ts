@@ -69,6 +69,14 @@
     </message>
 </context>
 <context>
+    <name>WorkerInfo</name>
+    <message>
+        <location filename="../qml/pages/WorkerInfo.qml" line="47"/>
+        <source>Информация о сотруднике</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Workers</name>
     <message>
         <location filename="../qml/pages/Workers.qml" line="21"/>

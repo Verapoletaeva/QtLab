@@ -63,21 +63,34 @@ function dbDeleteRow(id) {
 
 function dbGetById(id) {
     var db = dbGetHandle();
+    var model = [];
     var result;
     db.transaction(function(tx) {
         result = tx.executeSql('SELECT * FROM Workers WHERE rowid = ?', [id]);
+//        for (var i = 0; i < result.rows.length; i++) {
+//            model.push({
+//                           ID: result.rows.item(i).rowid,
+//                           surname: result.rows.item(i).surname,
+//                           name: result.rows.item(i).name,
+//                           patronymic: result.rows.item(i).patronymic,
+//                           education: result.rows.item(i).education,
+//                           position: result.rows.item(i).position,
+//                           departmentName: result.rows.item(i).departmentName,
+//                           companyName: result.rows.item(i).companyName,
+
+//                       })
+//            console.log(model[i].name, model[i].surname);
+//        }
     });
+    return ({
+                ID: result.rows.item(0).rowid,
+                surname: result.rows.item(0).surname,
+                name: result.rows.item(0).name,
+                patronymic: result.rows.item(0).patronymic,
+                education: result.rows.item(0).education,
+                position: result.rows.item(0).position,
+                departmentName: result.rows.item(0).departmentName,
+                companyName: result.rows.item(0).companyName,
 
-    if (result.rows.item(0))
-        return {
-            ID: result.rows.item(i).rowid,
-            surname: result.rows.item(i).surname,
-            name: result.rows.item(i).name,
-            patronymic: result.rows.item(i).patronymic,
-            education: result.rows.item(i).education,
-            position: result.rows.item(i).position,
-            departmentName: result.rows.item(i).departmentName,
-            companyName: result.rows.item(i).companyName
-        }
+            });
 }
-

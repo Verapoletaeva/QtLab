@@ -24,6 +24,8 @@ Page {
                 width: parent.width
                 label: "Фамилия"
                 placeholderText: "Введите фамилию"
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: name.focus = true
             }
 
             TextField {
@@ -31,6 +33,8 @@ Page {
                 width: parent.width
                 label: "Имя"
                 placeholderText: "Введите имя"
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: patronymic.focus = true
             }
 
             TextField {
@@ -38,6 +42,18 @@ Page {
                 width: parent.width
                 label: "Отчество"
                 placeholderText: "Введите отчество"
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: age.focus = true
+            }
+
+            TextField {
+                id: age
+                width: parent.width
+                label: "Возраст"
+                placeholderText: "Введите возраст"
+                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: education.focus = true
             }
 
             TextField {
@@ -45,6 +61,8 @@ Page {
                 width: parent.width
                 label: "Образование"
                 placeholderText: "Введите образование"
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: position.focus = true
             }
 
             TextField {
@@ -52,6 +70,8 @@ Page {
                 width: parent.width
                 label: "Должность"
                 placeholderText: "Введите должность"
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: departmentName.focus = true
             }
 
             TextField {
@@ -59,42 +79,34 @@ Page {
                 width: parent.width
                 label: "Отдел"
                 placeholderText: "Введите название отдела"
+                EnterKey.onClicked: { addNewWorker() }
             }
 
             TextField {
-                id: companyName
-                width: parent.width
-                label: "Компания"
-                placeholderText: "Введите название компании"
-            }
-
-            Text {
                 id: errorMessage
                 width: parent.width
+                readOnly: true
                 color: "red"
+                text: ''
+                visible: true
             }
 
             Button {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "Добавить"
-                onClicked: WR.dbInsert(surname.text, name.text, patronymic.text,
-                                       education.text, position.text, departmentName.text, companyName.text)
+                onClicked: addNewWorker()
             }
         }
     }
 
-//    function addNewWorker() {
-//        if(workerSurname.length === 0 || workerName.length === 0
-//                || workerPatronymic.length === 0 || workerEducation.length === 0
-//                || workerPosition.length === 0 || workerDepartmentName.length === 0 || workerCompanyName.length === 0){
-//            errorMessage.text = 'Есть незаполненные обязательные поля!';
-//            console.log("Не добавлен");
-//        } else {
-//            errorMessage.text = ''
-//            WR.addWorker(workerSurname.text, workerName.text, workerPatronymic.text,
-//                         workerEducation.text, workerPosition.text, workerDepartmentName.text, workerCompanyName.text);
-//            console.log(workerSurname.text, workerName.text, workerPatronymic.text,
-//                        workerEducation.text, workerPosition.text, workerDepartmentName.text, workerCompanyName.text);
-//        }
-//    }
+    function addNewWorker() {
+        if (surname.text === '' || name.text === '' || patronymic.text === '' || age.text === ''
+                || education.text === '' || position.text === '' || departmentName.text === '') {
+            errorMessage.text = 'Заполните все поля';
+        } else {
+            errorMessage.visible = '';
+            WR.dbInsert(surname.text, name.text, patronymic.text, age.text,
+                        education.text, position.text, departmentName.text);
+        }
+    }
 }

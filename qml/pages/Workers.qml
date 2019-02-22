@@ -7,6 +7,7 @@ import "../Workers.js" as WR
 Page {
     property var workers: []
     property bool all: false
+    property bool exist: true
 
     id: workersPage
 
@@ -23,9 +24,13 @@ Page {
             workerList.clear();
 
             if(all)
-                workers = WR.dbGetAll()
-            else {
+                workers = WR.dbGetAll();
 
+            if (workers.length === 0) {
+                exist = false;
+                workerList.append({ID: 1024, surname: 'Сотрудников не найдено', name: '', patronymic: ''});
+            } else {
+                exist = true;
             }
 
             for (var i = 0; i < workers.length; i++) {
@@ -40,16 +45,23 @@ Page {
                 color: highlighted ? Theme.highlightColor : Theme.primaryColor
                 anchors.verticalCenter: parent.verticalCenter
                 x: Theme.horizontalPageMargin
-                text: model.ID + ' ' + model.surname + ' ' + firstLetter(model.name) + '.' + firstLetter(model.patronymic) + '.'
+                text: model.ID.toString() + ' ' + model.surname + ' ' + firstLetter(model.name)
+                      + firstLetter(model.patronymic)
             }
 
-            onClicked: { pageStack.push(Qt.resolvedUrl("WorkerInfo.qml"), {workerId: model.ID}) }
+            onClicked: {
+                if (exist) {
+                    console.log(typeof model.ID, model.ID);
+                    pageStack.push(Qt.resolvedUrl("WorkerInfo.qml"), {workerId: model.ID});
+                }
+            }
         }
     }
 
     function firstLetter(str) {
         if (str.length)
-            return str[0];
+            return str[0] + '.';
+        return '';
     }
 }
 

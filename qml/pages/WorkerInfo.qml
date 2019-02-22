@@ -6,36 +6,11 @@ import "../Workers.js" as WR
 
 Page {
     property int workerId: 0
-    property var worker: { ID: 0; surname: ''; name: ''; patronymic: '' }
 
     id: workersInfoPage
 
     ListModel {
         id: infoModel
-        ListElement {
-            title: qsTr('ID: ' + worker.ID)
-        }
-        ListElement {
-            title: qsTr('Фамилия: ' + worker.surname)
-        }
-        ListElement {
-            title: qsTr('Имя: ' + worker.surname)
-        }
-        ListElement {
-            title: qsTr('Отчество: ' + worker.surname)
-        }
-        ListElement {
-            title: qsTr('Образование: ' + worker.surname)
-        }
-        ListElement {
-            title: qsTr('Должность: ' + worker.surname)
-        }
-        ListElement {
-            title: qsTr('Отдел: ' + worker.surname)
-        }
-        ListElement {
-            title: qsTr('Компания: ' + worker.surname)
-        }
     }
 
     SilicaListView {
@@ -52,73 +27,53 @@ Page {
             Label {
                 anchors.verticalCenter: parent.verticalCenter
                 x: Theme.horizontalPageMargin
-                text: model.title
-            }
-        }/*
-        BackgroundItem {
-            width: listView.width
-
-            Label {
-                anchors.verticalCenter: parent.verticalCenter
-                x: Theme.horizontalPageMargin
-                text: qsTr('Фамилия: ' + worker.surname)
+                text: qsTr(model.title + ': ' + model.name)
             }
         }
-        BackgroundItem {
-            width: listView.width
-
-            Label {
-                anchors.verticalCenter: parent.verticalCenter
-                x: Theme.horizontalPageMargin
-                text: 'ID: ' + worker.name
-            }
-        }
-        BackgroundItem {
-            width: listView.width
-
-            Label {
-                anchors.verticalCenter: parent.verticalCenter
-                x: Theme.horizontalPageMargin
-                text: 'ID: ' + worker.name
-            }
-        }
-        BackgroundItem {
-            width: listView.width
-
-            Label {
-                anchors.verticalCenter: parent.verticalCenter
-                x: Theme.horizontalPageMargin
-                text: 'ID: ' + worker.name
-            }
-        }
-        BackgroundItem {
-            width: listView.width
-
-            Label {
-                anchors.verticalCenter: parent.verticalCenter
-                x: Theme.horizontalPageMargin
-                text: 'ID: ' + worker.name
-            }
-        }
-        BackgroundItem {
-            width: listView.width
-
-            Label {
-                anchors.verticalCenter: parent.verticalCenter
-                x: Theme.horizontalPageMargin
-                text: 'ID: ' + worker.name
-            }
-        }
-        BackgroundItem {
-            width: listView.width
-
-            Label {
-                anchors.verticalCenter: parent.verticalCenter
-                x: Theme.horizontalPageMargin
-                text: 'ID: ' + worker.name
-            }
-        }*/
     }
 
-    onVisibleChanged: { worker = WR.dbGetById(workerId); console.log(worker.name) }
+    IconButton {
+        icon.source: "image://theme/icon-l-clear"
+        anchors {
+            bottom: parent.bottom
+            right: parent.right
+            centerIn: parent.Center
+            margins: 50
+        }
+        onClicked: { remove() }
+    }
+
+
+    TextField {
+        id: message
+        width: parent.width
+        readOnly: true
+        color: "red"
+        text: 'Сотрудник удален!'
+        visible: false
+    }
+
+    onVisibleChanged: { getInfo() }
+
+    function getInfo() {
+        if (workerId) {
+            var worker = WR.dbGetById(workerId);
+
+            infoModel.append({ title: 'ID', name: workerId.toString() });
+            infoModel.append({ title: 'Фамилия', name: worker.surname });
+            infoModel.append({ title: 'Имя', name: worker.name });
+            infoModel.append({ title: 'Отчество', name: worker.patronymic });
+            infoModel.append({ title: 'Возраст', name: worker.age });
+            infoModel.append({ title: 'Образование', name: worker.education });
+            infoModel.append({ title: 'Должность', name: worker.position });
+            infoModel.append({ title: 'Отдел', name: worker.departmentName });
+        }
+        message.visible = false;
+    }
+
+    function remove() {
+        listView.visible = false;
+        WR.dbRemoveRow(workerId);
+        message.visible = true;
+    }
 }

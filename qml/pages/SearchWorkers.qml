@@ -27,79 +27,78 @@ Page {
                 label: "ID"
                 placeholderText: "ID сотрудника"
                 inputMethodHints: Qt.ImhFormattedNumbersOnly
-                EnterKey.onClicked: pageStack.push(Qt.resolvedUrl('WorkerInfo.qml'),
-                                                   {workerID: workerID})
+                EnterKey.onClicked: searchById()
+            }
+
+            TextField {
+                id: errorMessage
+                width: parent.width
+                readOnly: true
+                color: "red"
+                text: 'Пользователя с таким ID не существует'
+                visible: false
             }
 
             Button {
                 id: searchByIdBtn
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: qsTr("Найти")
-                onClicked: pageStack.push(Qt.resolvedUrl('WorkerInfo.qml'), {workerID: workerID})
+                onClicked: searchById()
             }
 
             SectionHeader { text: "По параметрам" }
 
             TextField {
-                id: workerSurname;
+                id: surname;
                 width: parent.width
                 label: qsTr("Фамилия")
                 placeholderText: qsTr("Фамилия")
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: workerName.focus = true
+                EnterKey.onClicked: name.focus = true
             }
 
             TextField {
-                id: workerName
+                id: name
                 width: parent.width
                 label: qsTr("Имя")
                 placeholderText: qsTr("Имя")
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: workerPatronymic.focus = true
+                EnterKey.onClicked: patronymic.focus = true
             }
 
             TextField {
-                id: workerPatronymic
+                id: patronymic
                 width: parent.width
                 label: qsTr("Отчество")
                 placeholderText: qsTr("Отчество")
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: workerEducation.focus = true
+                EnterKey.onClicked: education.focus = true
             }
 
             TextField {
-                id: workerEducation
+                id: education
                 width: parent.width
                 label: qsTr("Образование")
                 placeholderText: qsTr("Образование")
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: workerPosition.focus = true
+                EnterKey.onClicked: position.focus = true
             }
 
             TextField {
-                id: workerPosition
+                id: position
                 width: parent.width
                 label: qsTr("Должность")
                 placeholderText: qsTr("Должность")
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: workerDepartmentName.focus = true
+                EnterKey.onClicked: departmentName.focus = true
             }
 
             TextField {
-                id: workerDepartmentName
+                id: departmentName
                 width: parent.width
                 label: qsTr("Отдел")
                 placeholderText: qsTr("Название отдела")
-                EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: workerCompanyName.focus = true
-            }
-
-            TextField {
-                id: workerCompanyName
-                width: parent.width
-                label: qsTr("Компания")
-                placeholderText: qsTr("Название компании")
-                onClicked: searchByParams()
+                EnterKey.onClicked: searchByParams()
             }
 
             Button {
@@ -112,6 +111,24 @@ Page {
     }
 
     function searchByParams() {
-        //pageStack.push(Qt.resolvedUrl('Workers.qml'), {})
+        var workers = [];
+        workers = WR.dbGetByParams(surname.text, name.text, patronymic.text,
+                                   education.text, position.text, departmentName.text);
+
+        pageStack.push(Qt.resolvedUrl('Workers.qml'), {workers: workers});
+    }
+
+    function searchById() {
+        var id = Number(workerID.text);
+        console.log(id, typeof id);
+
+        if (WR.dbHasId(id)) {
+            errorMessage.visible = false;
+            workerID.text = '';
+            pageStack.push(Qt.resolvedUrl('WorkerInfo.qml'), {workerId: id});
+        } else {
+            errorMessage.visible = true;
+            console.log('Id not exist');
+        }
     }
 }

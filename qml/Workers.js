@@ -3,7 +3,7 @@ function dbInit() {
 
     try {
         db.transaction(function(tx){
-            tx.executeSql('CREATE TABLE IF NOT EXISTS Workers(surname text, name text, patronymic text, education text, position text, departmentName text, companyName text)');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS Workers(Id numeric, surname text, name text, patronymic text, age text, education text, position text, departmentName text)');
             console.log('Database initialized');
             //tx.executeSql('DROP TABLE Workers');
             //tx.executeSql('DELETE FROM Workers');
@@ -23,15 +23,16 @@ function dbGetHandle() {
     return db;
 }
 
-function dbInsert(surname, name, patronymic, education, position, departmentName, companyName) {
+function dbInsert(surname, name, patronymic, age, education, position, departmentName) {
     var db = dbGetHandle();
     var rowid = 0;
     db.transaction(function(tx) {
-        tx.executeSql('INSERT INTO Workers VALUES(?,?,?,?,?,?,?)',
-                      [surname, name, patronymic, education, position, departmentName, companyName]);
+        tx.executeSql('INSERT INTO Workers VALUES(?,?,?,?,?,?,?,?)',
+                      [newId(), surname, name, patronymic, age, education, position, departmentName]);
         var result = tx.executeSql('SELECT last_insert_rowid()');
         rowid = result.insertId;
     });
+
     console.log('Новый пользователь!');
 }
 
@@ -39,14 +40,19 @@ function dbGetAll() {
     var db = dbGetHandle();
     var model = [];
     db.transaction(function(tx) {
-        var result = tx.executeSql('SELECT rowid,surname,name,patronymic FROM Workers ORDER BY rowid');
+        var result = tx.executeSql('SELECT * FROM Workers ORDER BY Id');
 
         for (var i = 0; i < result.rows.length; i++) {
+            var item = result.rows.item(i);
             model.push({
-                           ID: result.rows.item(i).rowid,
-                           surname: result.rows.item(i).surname,
-                           name: result.rows.item(i).name,
-                           patronymic: result.rows.item(i).patronymic
+                           ID: item.Id,
+                           surname: item.surname,
+                           name: item.name,
+                           patronymic: item.patronymic,
+                           age: item.age,
+                           education: item.education,
+                           position: item.position,
+                           departmentName: item.departmentName
                        })
             console.log(model[i].name);
         }
@@ -54,10 +60,10 @@ function dbGetAll() {
     return model;
 }
 
-function dbDeleteRow(id) {
+function dbRemoveRow(id) {
     var db = dbGetHandle();
     db.transaction(function(tx) {
-        tx.executeSql('DELETE FROM Workers WHERE rowid = ?', [id]);
+        tx.executeSql('DELETE FROM Workers WHERE Id = ?', [id]);
     })
 }
 
@@ -66,31 +72,67 @@ function dbGetById(id) {
     var model = [];
     var result;
     db.transaction(function(tx) {
-        result = tx.executeSql('SELECT * FROM Workers WHERE rowid = ?', [id]);
-//        for (var i = 0; i < result.rows.length; i++) {
-//            model.push({
-//                           ID: result.rows.item(i).rowid,
-//                           surname: result.rows.item(i).surname,
-//                           name: result.rows.item(i).name,
-//                           patronymic: result.rows.item(i).patronymic,
-//                           education: result.rows.item(i).education,
-//                           position: result.rows.item(i).position,
-//                           departmentName: result.rows.item(i).departmentName,
-//                           companyName: result.rows.item(i).companyName,
-
-//                       })
-//            console.log(model[i].name, model[i].surname);
-//        }
+        result = tx.executeSql('SELECT * FROM Workers WHERE Id = ?', [id]);
     });
-    return ({
-                ID: result.rows.item(0).rowid,
-                surname: result.rows.item(0).surname,
-                name: result.rows.item(0).name,
-                patronymic: result.rows.item(0).patronymic,
-                education: result.rows.item(0).education,
-                position: result.rows.item(0).position,
-                departmentName: result.rows.item(0).departmentName,
-                companyName: result.rows.item(0).companyName,
-
-            });
+    if (result.rows.length > 0) {
+        var item = result.rows.item(0);
+        return ({
+                    ID: item.Id,
+                    surname: item.surname,
+                    name: item.name,
+                    patronymic: item.patronymic,
+                    age: item.age,
+                    education: item.education,
+                    position: item.position,
+                    departmentName: item.departmentName
+                });
+    }
 }
+
+function dbHasId(id) {
+    var db = dbGetHandle();
+    var hasId = false;
+    db.transaction(function(tx) {
+        var result = tx.executeSql('SELECT * FROM Workers WHERE Id = ?', [id]);
+        if (result.rows.length > 0)
+            hasId = true;
+    });
+    return hasId;
+}
+
+function newId() {
+    var db = dbGetHandle();
+    var result;
+    var id = 1;
+    var exist = true;
+    db.transaction(function(tx) {
+        result = tx.executeSql('SELECT Id FROM Workers ORDER BY Id');
+    });
+
+    while (exist) {
+        exist = false;
+        for (var i = 0; i < result.rows.length; i++) {
+            if (result.rows.item(i).Id === id) {
+                exist = true;
+                id++;
+                break;
+            }
+        }
+    }
+
+    return id;
+}
+
+function dbGetByParams(surname, name, patronymic, education, position, departmentName) {
+    var workers = dbGetAll();
+    var res = [];
+    for (var i = 0; i < workers.length; i++) {
+        var item = workers[i];
+        if (item.surname.indexOf(surname) >= 0 && item.name.indexOf(name) >= 0
+                && item.patronymic.indexOf(patronymic) >= 0 && item.education.indexOf(education) >= 0
+                 && item.position.indexOf(position) >= 0 && item.departmentName.indexOf(departmentName) >= 0)
+            res.push(item);
+    }
+    return res;
+}
+
